@@ -24,7 +24,7 @@ def total(hand):
 
 def hit(hand, deck):
     hand.append(random.choice(deck))
-    # print("You now have: " + str(hand) + "for a total of "+ str(total(hand)))
+    # print("You now have: " + str(hand) + "for a total of " + str(total(hand)))
     return hand
 
 
@@ -61,18 +61,17 @@ def play_round(deck):
     print("You have " + str(player_hand))
     print("The dealer is showing " + str(dealer_hand))
 
-    # Check for blackjack
-    player_blackjack = total(player_hand) == 21
-
-    if player_blackjack:
-        print("You have a blackjack\n")
-
     # user input to resolve the hand
     while True:
-        chosen_action = input("Would you like to hit or stay? ")
+        # Check for blackjack
+        player_blackjack = total(player_hand) == 21
+        if player_blackjack:
+            print("You have a blackjack\n")
+            return False
+        chosen_action = input("Would you like to hit or stay? \n")
         if chosen_action == "hit":
             hit(player_hand, deck)
-            print("Your hand is now " + str(player_hand))
+            print("Your hand is now " + str(player_hand), str(total(player_hand)))
             if total(player_hand) > 21:
                 print("You've busted")
                 return False
@@ -82,7 +81,7 @@ def play_round(deck):
         if total(dealer_hand) == 21:
             print("The dealer has blackjack")
             if player_blackjack:
-                print("This is a push")
+                print("This is a push\n")
                 return True
             else:
                 print("The dealer won")
@@ -91,15 +90,18 @@ def play_round(deck):
             hit(dealer_hand, deck)
             print(total(dealer_hand))
         if total(dealer_hand) > 21:
-            print("The dealer busted, you won")
+            print("The dealer has " + str(total(dealer_hand)))
+            print("The dealer busted, you won\n")
             return True
         else:
             if total(player_hand) > total(dealer_hand):
-                print("You won this round")
+                print("You won this round\n")
                 return True
             else:
-                print("The dealer won")
+                print("The dealer has " + str(total(dealer_hand)))
+                print("The dealer won\n")
                 return False
+
 
 def run_game():
 
