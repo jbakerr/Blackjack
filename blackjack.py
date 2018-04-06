@@ -24,32 +24,7 @@ def total(hand):
 
 def hit(hand, deck):
     hand.append(random.choice(deck))
-    # print("You now have: " + str(hand) + "for a total of " + str(total(hand)))
     return hand
-
-
-def get_instructions():
-    command = input("Would you like to stay or hit? ")
-    return command
-
-
-def check_status(hand):
-    if total(hand) > 21:
-        print("You went bust!")
-        keep_playing = input("Would you like to play again? ")
-        return reset(keep_playing, hand)
-    else:
-        get_instructions()
-
-
-def reset(keep_playing, hand):
-    if keep_playing == "y":
-        hand = []
-        print(hand)
-        hand = get_hand(deck)
-        return hand
-    if keep_playing == "n":
-        exit()
 
 
 def play_round(deck):
@@ -58,8 +33,8 @@ def play_round(deck):
     dealer_hand = get_hand(deck)
 
     # Print hands
-    print("You have " + str(player_hand))
-    print("The dealer is showing " + str(dealer_hand))
+    print("You have " + str(player_hand), str(total(player_hand)))
+    print("The dealer is showing " + str(dealer_hand[0]))
 
     # user input to resolve the hand
     while True:
@@ -67,51 +42,73 @@ def play_round(deck):
         player_blackjack = total(player_hand) == 21
         if player_blackjack:
             print("You have a blackjack\n")
-            return False
-        chosen_action = input("Would you like to hit or stay? \n")
-        if chosen_action == "hit":
-            hit(player_hand, deck)
-            print("Your hand is now " + str(player_hand), str(total(player_hand)))
-            if total(player_hand) > 21:
-                print("You've busted")
-                return False
-            else:
-                continue
+        elif not player_blackjack:
+            chosen_action = input("Would you like to hit or stay? \n")
+            if chosen_action == "hit":
+                hit(player_hand, deck)
+                print("Your hand is now " + str(player_hand), str(total(player_hand)))
+                if total(player_hand) > 21:
+                    print("You've busted")
+                    return False, -1
+                else:
+                    continue
+            elif chosen_action == "stay":
+                print("Let's see what the dealer has.\n")
         # Resolve dealers hand
         if total(dealer_hand) == 21:
             print("The dealer has blackjack")
-            if player_blackjack:
+            if total(player_hand) == 21:
                 print("This is a push\n")
-                return True
+                return False, 1
             else:
                 print("The dealer won")
-                exit()
+                return False, -1
         while total(dealer_hand) < 17:
             hit(dealer_hand, deck)
-            print(total(dealer_hand))
         if total(dealer_hand) > 21:
             print("The dealer has " + str(total(dealer_hand)))
             print("The dealer busted, you won\n")
-            return True
+            return True, 2
         else:
             if total(player_hand) > total(dealer_hand):
-                print("You won this round\n")
-                return True
+                print("The dealer has " + str(total(dealer_hand)) + ", you won this round\n")
+                return True, 2
             else:
                 print("The dealer has " + str(total(dealer_hand)))
                 print("The dealer won\n")
-                return False
+                return False, -1
+
+
+def get_bet(money):
+    while True:
+        bet = input("What would you like to bet? ")
+        bet = int(bet)
+        if bet > money:
+            print("Please don't bet more than you have.")
+            continue
+        else:
+            return bet
 
 
 def run_game():
+    money = 100
 
-    while True:
-        play_round(deck)
-        play_again = input("Would you like to play again? ")
-        if play_again == "no":
-            return False
+    while money > 0:
+        bet = get_bet(money)
+        win, payout = play_round(deck)
+        if win:
+            money += (payout * bet)
         else:
-            continue
+            money += bet * payout
+        print("You have " + str(money))
+        if money > 0:
+            play_again = input("Would you like to play again? ")
+            if play_again == "no":
+                print("You've left the table with $" + str(money))
+                return
+            else:
+                continue
+    print("You've lost the game")
 
 
 run_game()
