@@ -1,4 +1,4 @@
-#To Do
+# To Do
 
 * Create deck of cards with values
 * Create player, with starting chip holdings
